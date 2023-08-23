@@ -1,10 +1,17 @@
 #!/bin/sh
-printf "Adding hosts file to /etc/pihole/gravity.db:\n"
+
 apt install sqlite3
+
+printf "Adding hosts file to /etc/pihole/gravity.db:\n"
 sqlite3 /etc/pihole/gravity.db "INSERT INTO adlist (address, enabled, comment) VALUES ('https://raw.githubusercontent.com/tsukudani0412/block-nintendo-for-pihole/main/nintendo-hosts.txt', 1, 'block nintendo servers');"
 printf "https://raw.githubusercontent.com/tsukudani0412/block-nintendo-for-pihole/main/nintendo-hosts.txt\n"
+
 printf "\nAdding regEx black list to *.nintendo.net\n"
 pihole --regex '(\.|^)nintendo\.net$'
+
+printf "\nAdding exact white list to ctest.cdn.nintendo.net\n"
+pihole -w 'ctest.cdn.nintendo.net'
+
 printf "\nAdding adlist to /etc/pihole/custom.list:\n"
 LOCALIP=`ip route get 8.8.8.8 | head -1 | awk '{print $7}'`
 printf "${LOCALIP} conntest.nintendowifi.net\n" | tee -a /etc/pihole/custom.list
